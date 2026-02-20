@@ -46,3 +46,20 @@ except rds.exceptions.DBClusterNotFoundFault:
 
         print("Waiting for the DB Cluster to become available...")
         time.sleep(40)
+
+# Modify the DB Cluster - Upgdate the scaling configuration for the cluster
+response = rds.modify_db_cluster(
+    DBClusterIdentifier=db_cluster_id,
+    ServerlessV2ScalingConfiguration={
+        "MinCapacity": 0,  # Minimum ACU
+        "MaxCapacity": 16,  # Maximum ACU
+        "SecondsUntilAutoPause": 300,  # Pause after 5 minutes of inactivity
+    },
+)
+print(f"Update the scaling for DB Cluster '{db_cluster_id}'.")
+
+# Delete the DB Cluster
+response = rds.delete_db_cluster(
+    DBClusterIdentifier=db_cluster_id, SkipFinalSnapshot=True
+)
+print(f"The '{db_cluster_id}' is being deleted.")
